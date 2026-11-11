@@ -1,0 +1,219 @@
+openapi: 3.0.3
+info:
+  title: Reference Service
+  description: "The example service: problem+json errors, request ids, rate limits, bearer scopes, signed webhooks, SSE and outbox."
+  version: 1.0.0
+  contact:
+    name: plinth maintainers
+    url: https://github.com/tcpsystems/plinth
+
+servers:
+  - url: http://localhost:8080
+    description: Local development
+
+paths:
+  /v1/cards:
+    get:
+      summary: List cards
+      operationId: listCards
+      tags:
+        - cards
+      responses:
+        "200":
+          description: Card list returned.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CardList"
+        "500":
+          description: Internal error.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+    post:
+      summary: Create a card
+      operationId: createCard
+      tags:
+        - cards
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CardCreate"
+      responses:
+        "201":
+          description: Card created.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Card"
+        "400":
+          description: Bad request.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+        "500":
+          description: Internal error.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+
+  /v1/cards/{id}:
+    get:
+      summary: Get a card by ID
+      operationId: getCard
+      tags:
+        - cards
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Card returned.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Card"
+        "404":
+          description: Card not found.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+        "500":
+          description: Internal error.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+    delete:
+      summary: Delete a card
+      operationId: deleteCard
+      tags:
+        - cards
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "204":
+          description: Card deleted.
+        "404":
+          description: Card not found.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+        "500":
+          description: Internal error.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+
+  /v1/events:
+    get:
+      summary: Subscribe to SSE event stream
+      operationId: subscribeEvents
+      tags:
+        - events
+      responses:
+        "200":
+          description: SSE event stream.
+          content:
+            text/event-stream:
+              schema:
+                type: string
+
+  /healthz:
+    get:
+      summary: Health check
+      operationId: healthz
+      tags:
+        - health
+      responses:
+        "200":
+          description: Service healthy.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                required:
+                  - status
+
+components:
+  securitySchemes:
+    bearer:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Card:
+      type: object
+      required: [id, kind, created_at, updated_at]
+      properties:
+        id:
+          type: string
+          format: uuid
+        kind:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    CardCreate:
+      type: object
+      required: [kind]
+      properties:
+        kind:
+          type: string
+
+    CardList:
+      type: object
+      required: [cards]
+      properties:
+        cards:
+          type: array
+          items:
+            $ref: "#/components/schemas/Card"
+
+    Problem:
+      type: object
+      required: [type, title, status, code]
+      properties:
+        type:
+          type: string
+          format: uri
+          description: "Problem type URI."
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string
+        instance:
+          type: string
+          description: "Request id (X-Request-ID) of the failed request."
+        code:
+          type: string
+          description: "Stable catalogue slug, for example not_found."
+        trace_id:
+          type: string

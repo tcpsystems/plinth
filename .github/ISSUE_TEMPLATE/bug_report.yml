@@ -1,0 +1,42 @@
+name: Bug report
+description: Something in plinth behaves wrongly
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the report. Do not include secrets, tokens or connection strings.
+  - type: input
+    id: version
+    attributes:
+      label: plinth version
+      description: Output of `go list -m github.com/tcpsystems/plinth`
+      placeholder: v0.3.0
+    validations:
+      required: true
+  - type: input
+    id: go
+    attributes:
+      label: Go version
+      description: Output of `go version`
+    validations:
+      required: true
+  - type: input
+    id: package
+    attributes:
+      label: Package
+      placeholder: github.com/tcpsystems/plinth/problem
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you did, what you expected, and what happened instead. A minimal reproducer helps most.
+    validations:
+      required: true
+  - type: textarea
+    id: extra
+    attributes:
+      label: Anything else
+      description: Logs, stack traces with secrets removed, related contract rule.

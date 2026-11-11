@@ -1,0 +1,14 @@
+# Error catalogue, v1.
+# type URI = https://tcp.systems/problems/<slug>. Slugs are stable within v1.
+# problem/catalogue.go mirrors this file; a test keeps them identical.
+problems:
+  - {slug: invalid, status: 400, title: Invalid Request, when: "The request is malformed or a field fails validation.", fix: "Check the request against the OpenAPI document and resend."}
+  - {slug: unauthorized, status: 401, title: Unauthorized, when: "No credential, or the credential is expired or unknown.", fix: "Send a valid bearer token or API key in the Authorization header."}
+  - {slug: forbidden, status: 403, title: Forbidden, when: "The credential is valid but lacks the required scope.", fix: "Request a key or token that carries the scope named in the detail."}
+  - {slug: not_found, status: 404, title: Not Found, when: "The resource does not exist or is not visible to the caller.", fix: "Check the identifier; resources owned by others are reported as not found."}
+  - {slug: conflict, status: 409, title: Conflict, when: "The request conflicts with the current state of the resource.", fix: "Re-read the resource and retry with current state."}
+  - {slug: idempotency_mismatch, status: 422, title: Idempotency Key Reused, when: "An Idempotency-Key was reused with a different request body.", fix: "Use a new key for a different request."}
+  - {slug: rate_limited, status: 429, title: Too Many Requests, when: "The caller exceeded a rate limit.", fix: "Wait for the number of seconds in Retry-After, then retry."}
+  - {slug: quota_exceeded, status: 429, title: Quota Exceeded, when: "A metered quota is used up for the current window.", fix: "Read /v1/quota and retry after the reset time."}
+  - {slug: internal, status: 500, title: Internal Server Error, when: "The service failed unexpectedly.", fix: "Retry with backoff and quote the request id if it persists."}
+  - {slug: unavailable, status: 503, title: Service Unavailable, when: "A dependency is down or the service is draining.", fix: "Retry after the Retry-After interval."}

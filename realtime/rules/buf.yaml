@@ -1,0 +1,14 @@
+# Buf v2 lint rules for protobuf services served through the realtime
+# Connect-JSON RPC.
+version: v2
+lint:
+  use:
+    - STANDARD
+  service_suffix: Service
+  rpc_allow_same_request_response: false
+  rpc_allow_google_protobuf_empty_requests: false
+  rpc_allow_google_protobuf_empty_responses: false
+# No breaking-change detection while the project is pre-1.0: v1 stays v1 and
+# may change freely as long as clients are regenerated in the same change.
+breaking:
+  use: []

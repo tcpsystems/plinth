@@ -1,0 +1,32 @@
+name: Feature request
+description: Propose a new package or an API change
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        plinth adds a package only for a need shown by two real services. Describe the services.
+  - type: textarea
+    id: need
+    attributes:
+      label: The need
+      description: Which services need this, and what do they do today instead?
+    validations:
+      required: true
+  - type: input
+    id: package
+    attributes:
+      label: Package
+      description: An existing package, or a proposed name that says what it provides
+    validations:
+      required: true
+  - type: textarea
+    id: api
+    attributes:
+      label: Proposed API
+      description: Function and type signatures, and how call sites read.
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Standard-library or in-service code that would avoid the change.

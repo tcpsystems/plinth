@@ -1,0 +1,69 @@
+# Spectral rules for backend-only OpenAPI and for served realtime schema
+# index documents. realtime/codegen_test.go checks the generator against them.
+rules:
+  tcp-backend-no-html-response:
+    description: Go services are backend-only (no Go-served HTML); OpenAPI responses must never declare text/html.
+    severity: error
+    given: "$.paths[*][*].responses[*].content"
+    then:
+      field: "@key"
+      function: pattern
+      functionOptions:
+        notMatch: "^text/html"
+
+  tcp-schema-index-service:
+    description: Served schema index must declare a lowercase service name.
+    severity: error
+    given: "$"
+    then:
+      field: service
+      function: pattern
+      functionOptions:
+        match: "^[a-z][a-z0-9-]*$"
+
+  tcp-schema-index-prefix:
+    description: Served schema index realtime_prefix must start with / and have no trailing slash.
+    severity: error
+    given: "$"
+    then:
+      field: realtime_prefix
+      function: pattern
+      functionOptions:
+        match: "^/[a-zA-Z0-9/_-]+[^/]$|^/[a-zA-Z0-9_-]$"
+
+  tcp-schema-index-event-kind:
+    description: Realtime event kinds must follow the dot-separated lowercase family.kind grammar.
+    severity: error
+    given: "$.events[*]"
+    then:
+      field: kind
+      function: pattern
+      functionOptions:
+        match: "^[a-z][a-z0-9]*(\\.[a-z][a-z0-9]*)+$"
+
+  tcp-schema-index-topic-pattern:
+    description: Subscription topic patterns must be *, exact lowercase slash-separated segments, or a trailing /* wildcard.
+    severity: error
+    given: "$.events[*]"
+    then:
+      field: topic_pattern
+      function: pattern
+      functionOptions:
+        match: "^(\\*|[a-z0-9][a-z0-9_\\-]*(/[a-z0-9][a-z0-9_\\-]*)*(/\\*)?)$"
+
+  tcp-schema-index-event-schema:
+    description: Every registered realtime event must carry a JSON Schema object.
+    severity: error
+    given: "$.events[*]"
+    then:
+      field: schema
+      function: truthy
+
+  tcp-schema-index-rpc-method:
+    description: Connect-JSON RPC methods must be fully qualified pkg.Service/Method names.
+    severity: error
+    given: "$.connect.rpc_methods[*]"
+    then:
+      function: pattern
+      functionOptions:
+        match: "^[a-z][a-z0-9_.]*\\.[A-Z][A-Za-z0-9]*/[A-Z][A-Za-z0-9]*$"

@@ -1,0 +1,43 @@
+# golangci-lint v2 configuration for this repository.
+#
+# Linters: errcheck, govet, ineffassign, staticcheck, misspell, unconvert;
+# formatters gofmt and goimports. `default: standard` supplies errcheck, govet,
+# ineffassign, staticcheck and unused; misspell and unconvert are enabled
+# explicitly. Deliberately no `issues.new-from-rev` here: the file describes the
+# whole tree; tools/gate.sh adds `--new-from-rev` on the command line so only
+# new findings block.
+#
+# Run it with `golangci-lint run -c lint/golangci.base.yml ./...` from the repo
+# root, or from keel/ with `../lint/golangci.base.yml`. Requires golangci-lint
+# v2; v1 cannot parse this file.
+version: "2"
+
+run:
+  # A lint run is a gate step, never a cache of an earlier tree.
+  timeout: 5m
+  tests: true
+
+linters:
+  default: standard
+  enable:
+    - misspell
+    - unconvert
+  settings:
+    govet:
+      enable-all: true
+      disable:
+        - fieldalignment
+        - shadow
+
+formatters:
+  enable:
+    - gofmt
+    - goimports
+  settings:
+    gofmt:
+      simplify: true
+
+issues:
+  # Report every finding; do not tune exit codes per path here.
+  max-issues-per-linter: 0
+  max-same-issues: 0
